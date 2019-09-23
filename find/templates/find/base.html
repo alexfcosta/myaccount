@@ -42,7 +42,7 @@
     </header>
     <main role="main" class="container">
       <div class="row">
-        <div class="col-md-4">
+        <div class="col-sm-4">
           {% if messages %}
             {% for message in messages %}
               <div class="alert alert-{{ message.tags }}">
@@ -52,14 +52,13 @@
           {% endif %}
           {% block content %}{% endblock %}
         </div>
-        <div class="col-md-8">
-          <div style="font-size: x-small; font-family: sans-serif;">
+        <div class="col-md-16">
+          <div style="font-size: small; font-family: sans-serif;">
             <h5>Query results</h5>
             {% block tabela %}{% endblock %}
           </div>
         </div>
       </div>
-
     </main>
 
     <!-- Optional JavaScript -->
