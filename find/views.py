@@ -35,14 +35,20 @@ def home(request):
             #    print(c)
 
             #cur.execute(select, [upper(postcode), upper(surname)])
-            row = cur.fetchall()
+            #row = cur.fetchall()
+
+            posts = []
+            for obj in cur.fetchall():
+                posts.append({"PER_GID": obj[0], "TITLE": obj[1], "INITIAL": obj[2], "FORENAME": obj[3], "SURNAME": obj[4], "STATUS": obj[5], "GENDER": obj[6], "CONTACT_TYPE": obj[7], "CONTACT_VALUE": obj[8], "POSTCODE": obj[9], "ADDRESS_LINE1": obj[10], "ADDRESS_LINE2": obj[11]})
+            context = {'all_posts': cur.fetchall()}
+
             #print('sql results')
-            #print(row)
+            print(posts)
             cur.close()
             conn.close()
             #ibm_db.close(ibm_db_conn)
             #return redirect('find-home')
-            args = {'form': form, 'table': row}
+            args = {'form': form, 'table': posts}
             return render(request, 'find/home.html', args)
     else:
         form = FindCustomerForm()

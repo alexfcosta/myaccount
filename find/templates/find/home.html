@@ -12,7 +12,7 @@
                 <button class="btn btn-outline-info" type="submit">Search</button>
             </div>
         </form>
-        <table style="width:100%">
+        <table class="table-responsive-sm table-bordered">
           <tr>
             <th>PER_GID</th>
             <th>TITLE</th>
@@ -29,7 +29,18 @@
           </tr>
           {% for row in table %}
           <tr>
-            <td>{{ row }}</td>
+            <td>{{ row.PER_GID }}</td>
+            <td>{{ row.TITLE }}</td>
+            <td>{{ row.INITIAL }}</td>
+            <td>{{ row.FORENAME }}</td>
+            <td>{{ row.SURNAME }}</td>
+            <td>{{ row.STATUS }}</td>
+            <td>{{ row.GENDER }}</td>
+            <td>{{ row.CONTACT_TYPE }}</td>
+            <td>{{ row.CONTACT_VALUE }}</td>
+            <td>{{ row.POSTCODE }}</td>
+            <td>{{ row.ADDRESS_LINE1 }}</td>
+            <td>{{ row.ADDRESS_LINE2 }}</td>
           </tr>
           {% endfor %}
         </table>
