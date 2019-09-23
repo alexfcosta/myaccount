@@ -12,7 +12,12 @@
                 <button class="btn btn-outline-info" type="submit">Search</button>
             </div>
         </form>
-        <table class="table-responsive-sm table-bordered">
+    </div>
+{% endblock content %}
+{% block tabela %}
+    <div class="form-row">
+        <table width="50%" class="table-xsm table-bordered">
+          <thead class="thead-dark">
           <tr>
             <th>PER_GID</th>
             <th>TITLE</th>
@@ -27,6 +32,8 @@
             <th>ADDRESS_LINE1</th>
             <th>ADDRESS_LINE2</th>
           </tr>
+          </thead>
+          <tbody>
           {% for row in table %}
           <tr>
             <td>{{ row.PER_GID }}</td>
@@ -43,8 +50,7 @@
             <td>{{ row.ADDRESS_LINE2 }}</td>
           </tr>
           {% endfor %}
+          </tbody>
         </table>
-
-
     </div>
-{% endblock content %}
+{% endblock tabela %}
