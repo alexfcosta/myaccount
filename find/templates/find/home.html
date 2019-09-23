@@ -1,0 +1,39 @@
+{% extends "find/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="content-section">
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Customer Details</legend>
+                {{ form|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Search</button>
+            </div>
+        </form>
+        <table style="width:100%">
+          <tr>
+            <th>PER_GID</th>
+            <th>TITLE</th>
+            <th>INITIAL</th>
+            <th>FORENAME</th>
+            <th>SURNAME</th>
+            <th>STATUS</th>
+            <th>GENDER</th>
+            <th>CONTACT_TYPE</th>
+            <th>CONTACT_VALUE</th>
+            <th>POSTCODE</th>
+            <th>ADDRESS_LINE1</th>
+            <th>ADDRESS_LINE2</th>
+          </tr>
+          {% for row in table %}
+          <tr>
+            <td>{{ row }}</td>
+          </tr>
+          {% endfor %}
+        </table>
+
+
+    </div>
+{% endblock content %}
