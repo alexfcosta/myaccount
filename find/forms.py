@@ -1,5 +1,4 @@
 from django import forms
-#from .models import Customers
 
 class FindCustomerForm(forms.Form):
     forename = forms.CharField(max_length=30, label='Forename')
@@ -43,18 +42,20 @@ class Register1(forms.Form):
         if not surname and not postcode:
             raise forms.ValidationError('You have to write something!')
 
+
 class Register2(forms.Form):
     phone = forms.CharField(max_length=15, label='Mobile or Landline', required=False)
-    line1 = forms.CharField(max_length=15, label='Address', required=False)
+    line1 = forms.CharField(max_length=30, label='Address', required=False)
     plan = forms.CharField(max_length=15, label='Plan Number', required=False)
 
     def clean(self):
         cleaned_data = super(Register2, self).clean()
-        phone = cleaned_data.get('Phone')
+        phone = cleaned_data.get('phone')
         line1 = cleaned_data.get('line1')
         plan = cleaned_data.get('plan')
-        if phone == '' or line1 == '' or plan == '':
-            raise forms.ValidationError('You have enter a value for Phone, Address or Plan!')
+        if not phone and not plan and not line1:
+            raise forms.ValidationError('You have to enter a value for Phone, Address or Plan!')
+
 
 class Dashboard(forms.Form):
     gid = forms.CharField(max_length=30, label='GID', disabled=True)

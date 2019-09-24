@@ -31,10 +31,14 @@ def home(request):
             and t1.PER_SURNAME = ?
             and t1.PER_FIRST_INITIAL = ?""", [upper(postcode), upper(surname), upper(forename[0])])
 
-            gid = []
+            gid_all = []
             for obj in cur.fetchall():
-                gid.append({"PER_GID": obj[0]})
-            gid_num = len(gid)
+                gid_all.append({"PER_GID": obj[0]})
+            gid_num = len(gid_all)
+
+            gid = ''
+            for row in gid_all:
+                gid = row['PER_GID']
 
             # DB2 Connection CLOSE
             cur.close()
@@ -51,8 +55,6 @@ def home(request):
                 return redirect('find-register2', forename, surname, postcode, email)
     else:
         form = Register1()
-    #args = {'form': form, 'table': row}
-    #return render(request, 'find/home.html', args)
     return render(request, 'find/home.html', {'form': form})
 
 
@@ -82,11 +84,9 @@ def register2(request, forename, surname, postcode, email):
     cust = []
     for obj in cur.fetchall():
         cust.append({"PER_GID": obj[0], "TITLE": obj[1], "INITIAL": obj[2], "FORENAME": obj[3], "SURNAME": obj[4],
-                      "STATUS": obj[5], "GENDER": obj[6], "CONTACT_TYPE": obj[7], "CONTACT_VALUE": obj[8],
-                      "POSTCODE": obj[9], "ADDRESS_LINE1": obj[10], "ADDRESS_LINE2": obj[11]})
-    context = {'all_posts': cur.fetchall()}
+                     "STATUS": obj[5], "GENDER": obj[6], "CONTACT_TYPE": obj[7], "CONTACT_VALUE": obj[8],
+                     "POSTCODE": obj[9], "ADDRESS_LINE1": obj[10], "ADDRESS_LINE2": obj[11]})
     tab_len = len(cust)
-
 
     cur.execute("""
     select distinct t2.PER_GID, t4.ITEM_ID as PLAN
@@ -112,67 +112,69 @@ def register2(request, forename, surname, postcode, email):
     cur.close()
     conn.close()
 
-    print(upper(email))
+    gid = ''
 
-    c = cust.count(upper(email))
+    if request.method == 'POST':
+        form = Register2(request.POST)
+        if form.is_valid():
+            phone = form.cleaned_data.get('phone')
+            line1 = form.cleaned_data.get('line1')
+            plan = form.cleaned_data.get('plan')
 
-    try:
-        i = cust.index(upper(email))
-    except ValueError:
-        index_value = -1
+            gid_count = 0
 
-    print('count: ', c)
-    print('index: ', c)
+            if plan:
+                for row in plans:
+                    if plan == row['PLAN']:
+                        gid = row['PER_GID']
+                        gid_count = 1
+            else:
+                i = 0
+                for row in cust:
+                    if row['CONTACT_VALUE'] == phone or line1 == row['ADDRESS_LINE1'] or line1 == row['ADDRESS_LINE2']:
+                        i += 1
+                        if i == 1:
+                            gid = row['PER_GID']
+                            gid_count = 1
+                        elif gid != row['PER_GID']:
+                            gid_count = gid_count + 1
 
-    if upper(email) in cust:
-        print('found email: ',upper(email),' for GID = ')
+            if gid_count == 1:
+                messages.success(request, f'Customer {forename} {surname} @ {postcode} was found.')
+                # phone = ''
+                return redirect('find-dashboard', gid, forename, surname, postcode, email)
+            elif plan and gid_count == 0:
+                messages.warning(request, f'Invalid Plan Number: {plan}')
+                form = Register2()
+            else:
+                messages.warning(request, f'Please enter more details or Plan Number.')
+                form = Register2()
 
-    i = 0
-    for row in cust:
-        if row['CONTACT_VALUE'] == upper(email) or forename == row['FORENAME']:
-            i+=1
-            if i == 1:
-                gid = row['PER_GID']
-            elif gid != row['PER_GID']:
-                messages.warning(request, f'Please enter additional details required for your identification.')
-
-    if i == 1:
-        print('Found one - GID :', gid)
-        messages.success(request, f'Thank you {forename} {surname} your account was created.')
-        phone = ''
-        return redirect('find-dashboard', gid, forename, surname, postcode, email)
     else:
-        messages.warning(request, f'Please enter additional details required for your identification.')
-        form = Register2()
-        # send data to form
-        args = {'form': form, 'table': cust, 'tab_len': tab_len, 'plans': plans, 'forename': forename, 'surname': surname, 'postcode': postcode, 'email': email}
-        return render(request, 'find/home.html', args)
 
-        if request.method == 'POST':
-            form = Register2(request.POST)
-            if form.is_valid():
-                phone = form.cleaned_data.get('phone')
-                line1 = form.cleaned_data.get('line1')
-                plan = form.cleaned_data.get('plan')
+        i = 0
+        for row in cust:
+            if row['CONTACT_VALUE'] == upper(email) or forename == row['FORENAME']:
+                i += 1
+                if i == 1:
+                    gid = row['PER_GID']
+                elif gid != row['PER_GID']:
+                    messages.warning(request, f'Please enter additional details required for your identification.')
 
-
-                # DB2 Connection
-                ibm_db_conn = ibm_db.connect("DATABASE=GCUKPRD;HOSTNAME=prddgcd001;PORT=50002;PROTOCOL=TCPIP;UID=costaa;PWD=London07;", "", "")
-                conn = ibm_db_dbi.Connection(ibm_db_conn)
-
-    #            if gid_num == 0:
-    #                messages.warning(request, f'No customers in the database with the information provided.')
-    #            elif gid_num == 1:
-    #                messages.success(request, f'Customer {forename} {surname} @ {postcode} was found.')
-                    #form = Register2()
-    #            else:
-    #                messages.warning(request, f'Please enter additional details required for your identification.')
-
-
+        if i == 1:
+            print('Found one - GID :', gid)
+            messages.success(request, f'Thank you {forename} {surname} your account was created.')
+            phone = ''
+            return redirect('find-dashboard', gid, forename, surname, postcode, email)
         else:
+            messages.warning(request, f'Please enter additional details required for your identification.')
+            # send data to form
             form = Register2()
+            args = {'form': form, 'table': cust, 'tab_len': tab_len, 'plans': plans, 'forename': forename, 'surname': surname, 'postcode': postcode, 'email': email}
+            return render(request, 'find/home.html', args)
 
-        return render(request, 'find/home.html', {'form': form})
+    args = {'form': form, 'table': cust, 'tab_len': tab_len, 'plans': plans, 'forename': forename, 'surname': surname, 'postcode': postcode, 'email': email}
+    return render(request, 'find/home.html', args)
 
 
 def dashboard(request, gid, forename, surname, postcode, email):
@@ -208,7 +210,6 @@ def dashboard(request, gid, forename, surname, postcode, email):
         plans.append({"PER_GID": obj[0], "ITEM_GID": obj[1], "PLAN": obj[2], "ITEM_LOCATION": obj[3], "POSTCODE": obj[4],
                       "BRAND": obj[5], "MODEL": obj[6], "SERIAL": obj[7], "PURCHASE_DATE": obj[8],
                       "RENEWAL_DATE": obj[9], "PLAN_STATUS": obj[10], "ITEM_CODE": obj[11], "DESCRIPTION": obj[12], "FAMILY": obj[13]})
-    #context = {'all_posts': cur.fetchall()}
     tab_len = len(plans)
 
     # retrieve all mailers from customer
@@ -230,15 +231,14 @@ def dashboard(request, gid, forename, surname, postcode, email):
         mailers.append({"PER_GID": obj[0], "ITEM_GID": obj[1], "ITEM_LOCATION": obj[2], "POSTCODE": obj[3],
                       "BRAND": obj[4], "MODEL": obj[5], "SERIAL": obj[6], "PURCHASE_DATE": obj[7],
                       "ITEM_CODE": obj[8], "DESCRIPTION": obj[9], "FAMILY": obj[10]})
-    #context = {'all_posts': cur.fetchall()}
     tab_len = tab_len + len(mailers)
 
     # DB2 Connection CLOSE
     cur.close()
     conn.close()
 
-    form = Dashboard(initial={'gid': gid, 'forename': forename, 'surname': surname, 'postcode': postcode, 'email': email})
     # send data to form
+    form = Dashboard(initial={'gid': gid, 'forename': forename, 'surname': surname, 'postcode': postcode, 'email': email})
     args = {'form': form, 'plans': plans, 'mailers': mailers, 'item_len': tab_len}
     return render(request, 'find/dashboard.html', args)
 
