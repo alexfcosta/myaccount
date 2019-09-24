@@ -87,6 +87,27 @@ def register2(request, forename, surname, postcode, email):
     context = {'all_posts': cur.fetchall()}
     tab_len = len(cust)
 
+
+    cur.execute("""
+    select distinct t2.PER_GID, t4.ITEM_ID as PLAN
+    from OPGCUK.PERSON_ITEM_RELATIONSHIP_OPGC t2
+    join OPGCUK.ITEM_OPGC t3 on t3.ITEM_GID = t2.ITEM_GID and t2.ITEM_REL_CAT = 'OWN'
+    join OPGCUK.ITEM_SOURCE_DETAIL_OPGC t4 on t4.ITEM_GID = t3.ITEM_GID
+    join REFDATA_INT.REF_ITEM t5 on t3.ITEM_CODE = t5.ITEM_CODE and t5.COUNTRY_CODE = 'GBR'
+    where left(t4.ITEM_ID,4) = 'PLN:'
+    and t3.ITEM_COVER_DG_CONTR_STATUS_CODE in ('N','R','L') -- exclude Cancelled
+    and t2.PER_GID IN (
+    select distinct t1.PER_GID
+            from OPGCUK.PERSON_OPGC t1
+            join OPGCUK.PERSON_CONTACT_POINT_ADDR_OPGC t2 on t1.PER_GID = t2.PER_GID
+            where t2.PER_POSTAL_ADDR_POSTCODE = ?
+            and t1.PER_SURNAME = ?
+            and t1.PER_FIRST_INITIAL = ?)""", [upper(postcode), upper(surname), upper(forename[0])])
+
+    plans = []
+    for obj in cur.fetchall():
+        plans.append({"PER_GID": obj[0], "PLAN": obj[1]})
+
     # DB2 Connection CLOSE
     cur.close()
     conn.close()
@@ -117,20 +138,21 @@ def register2(request, forename, surname, postcode, email):
 
     if i == 1:
         print('Found one - GID :', gid)
-        messages.success(request, f'Thank you {forename} {surname} your account is created.')
+        messages.success(request, f'Thank you {forename} {surname} your account was created.')
         phone = ''
         return redirect('find-dashboard', gid, forename, surname, postcode, email)
     else:
         messages.warning(request, f'Please enter additional details required for your identification.')
         form = Register2()
         # send data to form
-        args = {'form': form, 'table': cust, 'tab_len': tab_len, 'forename': forename, 'surname': surname, 'postcode': postcode, 'email': email}
+        args = {'form': form, 'table': cust, 'tab_len': tab_len, 'plans': plans, 'forename': forename, 'surname': surname, 'postcode': postcode, 'email': email}
         return render(request, 'find/home.html', args)
 
         if request.method == 'POST':
             form = Register2(request.POST)
             if form.is_valid():
                 phone = form.cleaned_data.get('phone')
+                line1 = form.cleaned_data.get('line1')
                 plan = form.cleaned_data.get('plan')
 
 
@@ -209,43 +231,16 @@ def dashboard(request, gid, forename, surname, postcode, email):
                       "BRAND": obj[4], "MODEL": obj[5], "SERIAL": obj[6], "PURCHASE_DATE": obj[7],
                       "ITEM_CODE": obj[8], "DESCRIPTION": obj[9], "FAMILY": obj[10]})
     #context = {'all_posts': cur.fetchall()}
-
+    tab_len = tab_len + len(mailers)
 
     # DB2 Connection CLOSE
     cur.close()
     conn.close()
 
-    # return redirect('find-home')
     form = Dashboard(initial={'gid': gid, 'forename': forename, 'surname': surname, 'postcode': postcode, 'email': email})
     # send data to form
     args = {'form': form, 'plans': plans, 'mailers': mailers, 'item_len': tab_len}
     return render(request, 'find/dashboard.html', args)
-
-#     if request.method == 'POST':
-#         form = Dashboard(request.POST)
-#         if form.is_valid():
-#             phone = form.cleaned_data.get('phone')
-#             plan = form.cleaned_data.get('plan')
-#
-#
-#             # DB2 Connection
-#             ibm_db_conn = ibm_db.connect("DATABASE=GCUKPRD;HOSTNAME=prddgcd001;PORT=50002;PROTOCOL=TCPIP;UID=costaa;PWD=London07;", "", "")
-#             conn = ibm_db_dbi.Connection(ibm_db_conn)
-#
-# #            if gid_num == 0:
-# #                messages.warning(request, f'No customers in the database with the information provided.')
-# #            elif gid_num == 1:
-# #                messages.success(request, f'Customer {forename} {surname} @ {postcode} was found.')
-#                 #form = Register2()
-# #            else:
-# #                messages.warning(request, f'Please enter additional details required for your identification.')
-#
-#
-#     else:
-#         form = Dashboard(initial={'gid': gid, 'forename': forename, 'surname': surname, 'postcode': postcode, 'email': email})
-#
-#     return render(request, 'find/home.html', {'form': form})
-#
 
 
 def about(request):
