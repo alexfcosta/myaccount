@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Customers(models.Model):
-    gid = models.CharField(max_length=50)
+    gid = models.CharField(max_length=30, primary_key=True)
     title = models.CharField(max_length=5)
     initial = models.CharField(max_length=1)
     forename = models.CharField(max_length=30)

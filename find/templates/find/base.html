@@ -22,7 +22,7 @@
     <header class="site-header">
       <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
         <div class="container">
-          <a class="navbar-brand mr-4" href="{% url 'find-home' %}">Find Customer</a>
+          <a class="navbar-brand mr-4" href="{% url 'find-home' %}">My Account</a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
           </button>
@@ -33,8 +33,8 @@
             </div>
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
-              <a class="nav-item nav-link" href="#">Login</a>
-              <a class="nav-item nav-link" href="#">Register</a>
+              <a class="nav-item nav-link" href="https://myaccountdomain.auth.us-east-1.amazoncognito.com/login?response_type=code&client_id=25gu7s72q1ln2jrhbvnbvgnsvp&redirect_uri=https://www.example.com">Login</a>
+              <a class="nav-item nav-link" href="https://myaccountdomain.auth.us-east-1.amazoncognito.com/signup?response_type=code&client_id=25gu7s72q1ln2jrhbvnbvgnsvp&redirect_uri=https://www.example.com">Register</a>
             </div>
           </div>
         </div>
@@ -42,7 +42,7 @@
     </header>
     <main role="main" class="container">
       <div class="row">
-        <div class="col-sm-4">
+        <div class="col-md-4">
           {% if messages %}
             {% for message in messages %}
               <div class="alert alert-{{ message.tags }}">
@@ -52,12 +52,15 @@
           {% endif %}
           {% block content %}{% endblock %}
         </div>
+
+        {% if tab_len > 0  %}
         <div class="col-md-16">
           <div style="font-size: small; font-family: sans-serif;">
             <h5>Query results</h5>
             {% block tabela %}{% endblock %}
           </div>
         </div>
+        {% endif %}
       </div>
     </main>
 
