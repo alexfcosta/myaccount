@@ -13,9 +13,9 @@
     <link rel="stylesheet" type="text/css" href="{% static 'find/main.css' %}">
 
     {% if title %}
-        <title>Find Customers - {{ title }}</title>
+        <title>My Account - {{ title }}</title>
     {% else %}
-        <title>Find Customers</title>
+        <title>My Account</title>
     {% endif %}
 </head>
 <body>
@@ -33,6 +33,7 @@
             </div>
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
+              <a class="nav-item nav-link" href="#">AWS Cognito : </a>
               <a class="nav-item nav-link" href="https://myaccountdomain.auth.us-east-1.amazoncognito.com/login?response_type=code&client_id=25gu7s72q1ln2jrhbvnbvgnsvp&redirect_uri=https://www.example.com">Login</a>
               <a class="nav-item nav-link" href="https://myaccountdomain.auth.us-east-1.amazoncognito.com/signup?response_type=code&client_id=25gu7s72q1ln2jrhbvnbvgnsvp&redirect_uri=https://www.example.com">Register</a>
             </div>
@@ -53,14 +54,41 @@
           {% block content %}{% endblock %}
         </div>
 
+
+        {% if prod_len > 0  %}
+        <div class="col-md-8">
+          <div class="content-section">
+            <h3>Dashboard</h3>
+            <p class='text-muted'>You can put any information here you'd like.
+              <ul class="list-group">
+                <li class="list-group-item list-group-item-light">Latest Posts</li>
+                <li class="list-group-item list-group-item-light">Announcements</li>
+                <li class="list-group-item list-group-item-light">Calendars</li>
+                <li class="list-group-item list-group-item-light">etc</li>
+              </ul>
+            </p>
+          </div>
+        </div>
+        {% endif %}
+
         {% if tab_len > 0  %}
-        <div class="col-md-16">
+        <div class="col-md-8">
           <div style="font-size: small; font-family: sans-serif;">
-            <h5>Query results</h5>
+            <h5>Matching Customer Data</h5>
+            <h6>Forename: {{ forename }}  |  Surname: {{ surname }}  |  Postcode: {{ postcode }}  |  Email: {{ email }} </h6>
             {% block tabela %}{% endblock %}
           </div>
         </div>
         {% endif %}
+
+        {% if item_len > 0  %}
+        <div class="col-md-8">
+          <div style="font-size: small; font-family: sans-serif;">
+            {% block items %}{% endblock %}
+          </div>
+        </div>
+        {% endif %}
+
       </div>
     </main>
 

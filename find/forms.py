@@ -45,10 +45,27 @@ class Register1(forms.Form):
 
 class Register2(forms.Form):
     phone = forms.CharField(max_length=15, label='Mobile or Landline', required=False)
+    line1 = forms.CharField(max_length=15, label='Address', required=False)
     plan = forms.CharField(max_length=15, label='Plan Number', required=False)
 
     def clean(self):
         cleaned_data = super(Register2, self).clean()
+        phone = cleaned_data.get('Phone')
+        line1 = cleaned_data.get('line1')
+        plan = cleaned_data.get('plan')
+        if phone == '' or line1 == '' or plan == '':
+            raise forms.ValidationError('You have enter a value for Phone, Address or Plan!')
+
+class Dashboard(forms.Form):
+    gid = forms.CharField(max_length=30, label='GID', disabled=True)
+    forename = forms.CharField(max_length=30, label='Forename', disabled=True)
+    surname = forms.CharField(max_length=30, label='Surname', disabled=True)
+    postcode = forms.CharField(max_length=8, label='Postcode', disabled=True)
+    email = forms.EmailField(max_length=254, label='Email', disabled=True)
+    phone = forms.CharField(max_length=15, label='Mobile or Landline', disabled=True)
+
+    def clean(self):
+        cleaned_data = super(Dashboard, self).clean()
         forename = cleaned_data.get('name')
         surname = cleaned_data.get('surname')
         postcode = cleaned_data.get('postcode')
