@@ -73,9 +73,7 @@
 
         {% if tab_len > 0  %}
         <div class="col-md-8">
-          <div style="font-size: small; font-family: sans-serif;">
-            <h5>Matching Customer Data</h5>
-            <h6>Forename: {{ forename }}  |  Surname: {{ surname }}  |  Postcode: {{ postcode }}  |  Email: {{ email }} </h6>
+          <div style="font-size: x-small; font-family: sans-serif;">
             {% block tabela %}{% endblock %}
           </div>
         </div>
@@ -83,7 +81,7 @@
 
         {% if item_len > 0  %}
         <div class="col-md-8">
-          <div style="font-size: small; font-family: sans-serif;">
+          <div style="font-size: x-small; font-family: sans-serif;">
             {% block items %}{% endblock %}
           </div>
         </div>

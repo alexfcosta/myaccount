@@ -16,12 +16,12 @@
 {% endblock content %}
 {% block items %}
     <div class="content-section">
-        <h3>Plans</h3>
-        <table class="table-xsm table-bordered">
+    <h5>Plans</h5>
+    <div class="table-responsive">
+        <table class="table-xsm table-bordered table-dark">
           {% if item_len > 0  %}
           <thead class="thead-dark">
           <tr>
-            <th>PER_GID</th>
             <th>ITEM_GID</th>
             <th>PLAN</th>
             <th>ITEM_LOCATION</th>
@@ -41,7 +41,6 @@
           {% for row in plans %}
           <tbody>
           <tr>
-            <td>{{ row.PER_GID }}</td>
             <td>{{ row.ITEM_GID }}</td>
             <td>{{ row.PLAN }}</td>
             <td>{{ row.ITEM_LOCATION }}</td>
@@ -59,12 +58,15 @@
           {% endfor %}
           </tbody>
         </table>
-        <h3>Mailers</h3>
-        <table class="table-xsm table-bordered">
+    </div>
+    </div>
+    <div class="content-section">
+    <h5>Mailers</h5>
+    <div class="table-responsive">
+        <table class="table-sm table-bordered table-dark">
           {% if item_len > 0  %}
           <thead class="thead-dark">
           <tr>
-            <th>PER_GID</th>
             <th>ITEM_GID</th>
             <th>ITEM_LOCATION</th>
             <th>POSTCODE</th>
@@ -81,7 +83,6 @@
           {% for row in mailers %}
           <tbody>
           <tr>
-            <td>{{ row.PER_GID }}</td>
             <td>{{ row.ITEM_GID }}</td>
             <td>{{ row.ITEM_LOCATION }}</td>
             <td>{{ row.POSTCODE }}</td>
@@ -96,5 +97,6 @@
           {% endfor %}
           </tbody>
         </table>
+    </div>
     </div>
 {% endblock items %}
